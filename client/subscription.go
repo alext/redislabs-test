@@ -21,6 +21,8 @@ type Database struct {
 	Name   string `json:"db_name"`
 	URL    string `json:"db_master_url_public"`
 	Status string `json:"db_status"`
+	Cert   []byte
+	Key    []byte
 }
 
 func (c *Client) ListDBs() ([]Subscription, error) {
@@ -100,6 +102,11 @@ func (c *Client) ProvisionDB(name string) (*Database, error) {
 		return nil, err
 	}
 
+	cert, key, err := generateCert(name)
+	if err != nil {
+		return nil, err
+	}
+
 	req, err := http.NewRequest("POST", APIUrl+"/CrudBdb", nil)
 	if err != nil {
 		return nil, err
@@ -111,6 +118,8 @@ func (c *Client) ProvisionDB(name string) (*Database, error) {
 	q.Add("eviction", "volatile-lru")
 	q.Add("memory", "100")
 	q.Add("replication", "true")
+	q.Add("cb_ssl", "on")
+	q.Add("cert", string(cert))
 
 	q.Add("security_group", "[]")
 	q.Add("sip", "[]")
@@ -156,6 +165,7 @@ func (c *Client) ProvisionDB(name string) (*Database, error) {
 		time.Sleep(100 * time.Millisecond)
 	}
 	fmt.Println("done in", time.Since(start))
+	db.Cert, db.Key = cert, key
 	return db, nil
 }
 

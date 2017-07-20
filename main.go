@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"io/ioutil"
 	"log"
 	"strconv"
 	"time"
@@ -25,6 +26,14 @@ func main() {
 		log.Fatal(err)
 	}
 	pretty.Println(db)
+	err = ioutil.WriteFile("certs/"+db.Name+"_cert.pem", db.Cert, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = ioutil.WriteFile("certs/"+db.Name+"_key.pem", db.Key, 0600)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	dbData, err := apiClient.ListDBs()
 	if err != nil {
