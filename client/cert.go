@@ -28,10 +28,6 @@ func generateCert(cn string) ([]byte, []byte, error) {
 		},
 		NotBefore: time.Now(),
 		NotAfter:  time.Now().Add(100 * 8760 * time.Hour), // 100 years from now
-
-		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-		BasicConstraintsValid: true,
 	}
 
 	priv, err := rsa.GenerateKey(rand.Reader, keyBits)
